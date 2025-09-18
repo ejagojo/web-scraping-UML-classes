@@ -1,11 +1,12 @@
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 import json
 import time
+import sys
+import os
 
 BASE_URL = "https://www.uml.edu"
-URL = f"{BASE_URL}/catalog/undergraduate/sciences/departments/computer-science/degree-pathways/dp-cs-general-2020.aspx"
-HEADERS = {"User-Agent": "UML-CS-Scraper/1.0 (Academic Research; contact: your-email@uml.edu)"}
+HEADERS = {"User-Agent": "UML-Scraper/1.0 (Academic Research; contact: your-email@uml.edu)"}
 
 def fetch_page(url):
     """Safely fetch the webpage and return HTML."""
@@ -34,7 +35,6 @@ def fetch_course_details(course_url):
         if prereq_p:
             details["prerequisites"] = prereq_p.get_text(" ", strip=True)
     else:
-        # Sometimes there are no prerequisites section
         details["prerequisites"] = "This class has no prerequisites."
 
     return details
@@ -46,7 +46,6 @@ def parse_course_table(table):
     for row in rows:
         cols = row.find_all("td")
         if len(cols) == 3:
-            # Look for link to course detail page
             link_tag = cols[0].find("a")
             course_url = link_tag["href"] if link_tag else None
 
@@ -65,7 +64,6 @@ def parse_course_table(table):
                 "prerequisites": None
             }
 
-            # If we have a course link, fetch details
             if course_url:
                 details = fetch_course_details(course_url)
                 course_data.update(details)
@@ -73,51 +71,59 @@ def parse_course_table(table):
             courses.append(course_data)
     return courses
 
-def parse_pathway(html):
+def parse_pathway(html, major):
     """Parse the degree pathway into a JSON structure."""
     soup = BeautifulSoup(html, "lxml")
+    data = {"major": major, "pathway": {}}
 
-    data = {"major": "Computer Science", "pathway": {}}
-
-    # Each year section is an <h2>
     for year_header in soup.find_all("h2"):
         year_name = year_header.get_text(strip=True)
         if "Year" not in year_name:
-            continue  # skip things like "Notes"
-
-        year_data = {}
-        year_section = year_header.find_next("div", class_="row")
-        if not year_section:
             continue
 
-        semesters = year_section.find_all("div", class_="column")
-        for sem in semesters:
-            sem_header = sem.find("h3")
-            if not sem_header:
-                continue
-            sem_name = sem_header.get_text(strip=True)
+        year_data = {}
+        current_sem = None
 
-            # course table inside this semester
-            table = sem.find("table")
-            if table:
-                year_data[sem_name] = parse_course_table(table)
+        for el in year_header.next_elements:
+            if isinstance(el, Tag) and el.name == "h2":
+                break
 
-        data["pathway"][year_name] = year_data
+            if isinstance(el, Tag) and el.name == "h3":
+                current_sem = el.get_text(strip=True)
+
+            if isinstance(el, Tag) and el.name == "table" and current_sem:
+                year_data.setdefault(current_sem, []).extend(parse_course_table(el))
+
+        if year_data:
+            data["pathway"][year_name] = year_data
 
     return data
 
-def main():
-    html = fetch_page(URL)
-    data = parse_pathway(html)
+def extract_filename_from_url(url):
+    """Turn a UML catalog URL into a clean filename."""
+    last_part = url.strip().split("/")[-1]      # e.g. dp-cs-general-2020.aspx
+    name = last_part.replace("dp-", "").replace(".aspx", "")
+    return name
 
-    # Save JSON
-    with open("data/catalog.json", "w", encoding="utf-8") as f:
+def main():
+    if len(sys.argv) != 3:
+        print("Usage: python scraper.py '<Major Name>' '<Catalog URL>'")
+        sys.exit(1)
+
+    major = sys.argv[1]
+    url = sys.argv[2]
+
+    html = fetch_page(url)
+    data = parse_pathway(html, major)
+
+    os.makedirs("data", exist_ok=True)
+    filename_key = extract_filename_from_url(url)
+    filename = f"data/{filename_key}.json"
+
+    with open(filename, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
-    print("✅ Scraping complete. Data saved to data/catalog.json")
-
-    # Preview sample: Freshman Fall Semester
-    # print(json.dumps(data["pathway"]["Freshman Year"]["Fall Semester"], indent=2))
+    print(f"✅ Scraping complete. Data saved to {filename}")
 
 if __name__ == "__main__":
     main()
