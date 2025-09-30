@@ -24,7 +24,7 @@ python scraper_for_UML_classes/scraper.py '<Major Name>' '<Catalog URL>'
 
 Examples (from project root):
 ```bash
-python scraper_for_UML_classes/scraper.py "Computer Science" "https://www.uml.edu/catalog/undergraduate/sciences/departments/computer-science/degree-pathways/dp-cs-general-2020.aspx"
+python scraper_for_UML_classes/scraper.py "Computer-Science" "https://www.uml.edu/catalog/undergraduate/sciences/departments/computer-science/degree-pathways/dp-cs-general-2020.aspx"
 
 python scraper_for_UML_classes/scraper.py "Nursing" "https://www.uml.edu/catalog/undergraduate/health-sciences/departments/nursing/degree-pathways/dp-nursing-3.5year-2025.aspx"
 ```

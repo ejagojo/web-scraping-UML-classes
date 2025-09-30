@@ -17,7 +17,7 @@ def fetch_page(url):
 def fetch_course_details(course_url):
     """Scrape a course page for description and prerequisites."""
     full_url = BASE_URL + course_url
-    time.sleep(5)  # throttle to avoid hammering UML servers
+    time.sleep(2.5)  # throttle to avoid hammering UML servers
     html = fetch_page(full_url)
     soup = BeautifulSoup(html, "lxml")
 
