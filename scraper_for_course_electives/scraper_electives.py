@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# /school/Fall2025/MobileAppProgrammingI/finalProject/web-scraping-classes/scraper_for_course_electives/scraper_electives.py
 
 import requests
 import json
@@ -8,7 +7,7 @@ import os
 from typing import Any, Dict, Iterable, List
 
 HEADERS = {
-    "User-Agent": "HawkAdvisor-Scraper/1.0 (Academic Project; ejagojo@gmail.com)"
+    "User-Agent": "HawkAdvisor-Scraper/1.0 (Academic Project; RRRRRRRRRRR@gmail.com)"
 }
 
 API_URL = "https://www.uml.edu/api/registrar/course_catalog/v1.0/courses"
