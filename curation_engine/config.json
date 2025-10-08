@@ -1,0 +1,187 @@
+{
+  "Computer_Science": {
+    "output_dir_name": "Computer_Science",
+    "pathways_dir_name": "computer_science",
+    "pathway_files": {
+      "General Option": "cs-general-2020.json",
+      "Data Science Option": "cs-data-science-2020.json",
+      "Cybersecurity Option": "cs-cybersecurity-2020.json"
+    },
+    "relevant_catalogs": [
+      "comp_courses.json",
+      "arts_humanities_courses.json",
+      "social_sciences_courses.json",
+      "sciences_with_lab.json"
+    ],
+    "careers": [
+      {
+        "career_name": "Frontend Developer",
+        "base_pathway_name": "General Option",
+        "tech_keywords": {"javascript": 10, "react": 10, "web": 8, "css": 8, "html": 8, "ui": 8, "ux": 8, "interface": 8},
+        "secondary_keywords": {"typescript": 5, "design": 5, "accessibility": 5, "figma": 3},
+        "nice_to_have_keywords": {"api": 3, "node.js": 2, "full-stack": 2},
+        "general_ed_keywords": {"design": 10, "communication": 8, "visual": 5, "creative": 5, "psychology": 3, "writing": 3},
+        "negative_keywords": ["music", "sculpture", "painting", "backend", "server", "database", "c++"]
+      },
+      {
+        "career_name": "Backend Developer",
+        "base_pathway_name": "General Option",
+        "tech_keywords": {"server": 10, "api": 10, "database": 10, "sql": 8, "python": 8, "java": 8, "go": 8, "rust": 8},
+        "secondary_keywords": {"distributed": 8, "network": 8, "performance": 5, "scalability": 5, "cloud": 5, "nosql": 5},
+        "nice_to_have_keywords": {"javascript": 3, "typescript": 2, "web": 2, "react": 1},
+        "general_ed_keywords": {"logic": 10, "systems": 8, "economics": 5, "problem solving": 5, "critical thinking": 3},
+        "negative_keywords": ["ui", "ux", "frontend", "css", "html", "graphic design", "art"]
+      },
+      {
+        "career_name": "Full Stack Developer",
+        "base_pathway_name": "General Option",
+        "core_keywords": {"javascript": 10, "react": 10, "node.js": 10, "full-stack": 10, "server": 8, "api": 8, "database": 8},
+        "secondary_keywords": {"web": 5, "deployment": 5, "html": 5, "css": 5, "sql": 5, "typescript": 5},
+        "nice_to_have_keywords": {"cloud": 2, "architecture": 2},
+        "general_ed_keywords": {"design": 8, "problem solving": 8, "communication": 5, "systems": 3},
+        "negative_keywords": ["music", "painting", "sculpture", "performing"]
+      },
+      {
+        "career_name": "Software Architect",
+        "base_pathway_name": "General Option",
+        "core_keywords": {"architecture": 10, "design patterns": 10, "systems design": 10},
+        "secondary_keywords": {"scalability": 8, "performance": 8, "distributed": 8, "microservices": 8, "cloud": 5},
+        "nice_to_have_keywords": {"uml": 3, "api": 3},
+        "general_ed_keywords": {"systems": 10, "leadership": 8, "communication": 8, "business": 5, "strategy": 5},
+        "negative_keywords": ["introductory", "basic", "marketing", "art"]
+      },
+      {
+        "career_name": "QA Engineer",
+        "base_pathway_name": "General Option",
+        "core_keywords": {"testing": 10, "quality assurance": 10, "automation": 8, "test cases": 8},
+        "secondary_keywords": {"selenium": 5, "jest": 5, "debug": 5, "validation": 5},
+        "nice_to_have_keywords": {"ci/cd": 3, "scripting": 2},
+        "general_ed_keywords": {"critical thinking": 10, "logic": 8, "detail-oriented": 8, "communication": 5},
+        "negative_keywords": ["art", "music", "history", "creative", "design"]
+      },
+      {
+        "career_name": "Android Developer",
+        "base_pathway_name": "General Option",
+        "core_keywords": {"mobile": 10, "android": 10, "kotlin": 10, "java": 8},
+        "secondary_keywords": {"sdk": 5, "mobile application": 5, "ui": 3, "ux": 3, "api": 3},
+        "nice_to_have_keywords": {"firebase": 2, "sqlite": 2},
+        "general_ed_keywords": {"design": 8, "user experience": 5, "creative": 3},
+        "negative_keywords": ["web", "ios", "swift", "server", "database"]
+      },
+      {
+        "career_name": "iOS Developer",
+        "base_pathway_name": "General Option",
+        "core_keywords": {"mobile": 10, "ios": 10, "swift": 10},
+        "secondary_keywords": {"uikit": 8, "swiftui": 8, "sdk": 5, "mobile application": 5, "ui": 3, "ux": 3},
+        "nice_to_have_keywords": {"firebase": 2, "core data": 2},
+        "general_ed_keywords": {"design": 8, "user experience": 5, "creative": 3},
+        "negative_keywords": ["web", "android", "kotlin", "java", "server", "database"]
+      },
+      {
+        "career_name": "Data Analyst",
+        "base_pathway_name": "Data Science Option",
+        "core_keywords": {"analysis": 10, "sql": 10, "statistics": 8, "visualization": 8},
+        "secondary_keywords": {"tableau": 8, "power bi": 8, "excel": 5, "reporting": 5, "python": 5},
+        "nice_to_have_keywords": {"business intelligence": 3, "data mining": 3},
+        "general_ed_keywords": {"business": 10, "communication": 8, "reporting": 8, "insights": 5, "analytical": 5},
+        "negative_keywords": ["software engineering", "web development", "frontend", "c++", "java"]
+      },
+      {
+        "career_name": "Data Engineer",
+        "base_pathway_name": "Data Science Option",
+        "core_keywords": {"etl": 10, "data pipeline": 10, "sql": 8, "python": 8, "data warehouse": 8},
+        "secondary_keywords": {"spark": 8, "hadoop": 5, "kafka": 5, "nosql": 5, "big data": 5},
+        "nice_to_have_keywords": {"cloud": 3, "aws": 3, "azure": 3, "scalability": 2},
+        "general_ed_keywords": {"systems": 10, "architecture": 8, "scalability": 5, "logic": 5},
+        "negative_keywords": ["frontend", "ui", "ux", "css", "marketing", "user research", "visualization", "tableau"]
+      },
+      {
+        "career_name": "AI and Data Scientist",
+        "base_pathway_name": "Data Science Option",
+        "core_keywords": {"machine learning": 10, "statistics": 10, "python": 8, "algorithms": 8},
+        "secondary_keywords": {"neural networks": 8, "tensorflow": 5, "pytorch": 5, "ai": 5, "modeling": 5},
+        "nice_to_have_keywords": {"data": 3, "visualization": 3, "big data": 2},
+        "general_ed_keywords": {"research": 10, "critical thinking": 8, "mathematics": 8, "modeling": 5, "analysis": 5},
+        "negative_keywords": ["web design", "ux", "ui", "marketing", "css", "html"]
+      },
+      {
+        "career_name": "Cyber Security Analyst",
+        "base_pathway_name": "Cybersecurity Option",
+        "core_keywords": {"security": 10, "cybersecurity": 10, "network security": 8, "firewall": 8},
+        "secondary_keywords": {"penetration testing": 8, "encryption": 5, "malware": 5, "incident response": 5},
+        "nice_to_have_keywords": {"cryptography": 3, "linux": 3, "scripting": 2},
+        "general_ed_keywords": {"analytical": 10, "detail-oriented": 8, "ethics": 8, "reporting": 5, "logic": 5},
+        "negative_keywords": ["web development", "marketing", "product management", "art", "design", "ui", "ux"]
+      }
+    ]
+  },
+  "Nursing": {
+    "output_dir_name": "Nursing",
+    "pathways_dir_name": "nursing",
+    "pathway_files": {
+      "4-Year Degree": "nursing-4year-2025.json"
+    },
+    "relevant_catalogs": [
+      "nurse_courses.json",
+      "arts_humanities_courses.json",
+      "social_sciences_courses.json",
+      "sciences_with_lab.json"
+    ],
+    "careers": [
+      {
+        "career_name": "ICU - Critical Care Nurse",
+        "base_pathway_name": "4-Year Degree",
+        "core_keywords": {"critical care": 10, "intensive care": 10, "acute": 8, "pharmacology": 8, "cardiac": 5, "ventilator": 5},
+        "secondary_keywords": {"trauma": 5, "pathophysiology": 5, "assessment": 5},
+        "nice_to_have_keywords": {},
+        "general_ed_keywords": {"ethics": 10, "psychology": 8, "sociology": 5, "stress management": 5, "communication": 5},
+        "negative_keywords": ["pediatric", "child", "community", "public health", "maternity", "education"]
+      },
+      {
+        "career_name": "Pediatric Nurse",
+        "base_pathway_name": "4-Year Degree",
+        "core_keywords": {"pediatric": 10, "child": 10, "infant": 8, "adolescent": 8},
+        "secondary_keywords": {"development": 5, "family-centered care": 5, "immunization": 3},
+        "nice_to_have_keywords": {},
+        "general_ed_keywords": {"communication": 10, "family": 8, "psychology": 5, "sociology": 3},
+        "negative_keywords": ["geriatric", "adult health", "critical care", "trauma", "oncology"]
+      },
+      {
+        "career_name": "Oncology Nurse",
+        "base_pathway_name": "4-Year Degree",
+        "core_keywords": {"oncology": 10, "cancer": 10, "chemotherapy": 8},
+        "secondary_keywords": {"radiation": 5, "palliative care": 5, "hospice": 3},
+        "nice_to_have_keywords": {},
+        "general_ed_keywords": {"empathy": 10, "ethics": 8, "communication": 8, "support": 5},
+        "negative_keywords": ["pediatric", "maternity", "labor", "trauma", "critical care"]
+      },
+      {
+        "career_name": "Nurse Educator",
+        "base_pathway_name": "4-Year Degree",
+        "core_keywords": {"education": 10, "teaching": 10, "curriculum": 8},
+        "secondary_keywords": {"clinical instructor": 8, "mentoring": 5, "patient education": 5},
+        "nice_to_have_keywords": {},
+        "general_ed_keywords": {"leadership": 10, "communication": 8, "mentoring": 8, "curriculum": 5},
+        "negative_keywords": ["informatics", "data", "technology", "icu", "trauma"]
+      },
+      {
+        "career_name": "Informatics Nurse Specialist",
+        "base_pathway_name": "4-Year Degree",
+        "core_keywords": {"informatics": 10, "data": 10, "ehr": 8, "electronic health record": 8, "technology": 5},
+        "secondary_keywords": {"systems": 5, "analysis": 5, "hipaa": 3, "workflow": 3},
+        "nice_to_have_keywords": {"project management": 2, "python": 1, "sql": 1},
+        "general_ed_keywords": {"systems": 10, "analysis": 8, "project management": 5, "training": 5, "logic": 5},
+        "negative_keywords": ["bedside", "direct patient care", "pharmacology", "icu", "trauma"]
+      },
+      {
+        "career_name": "Public Health Nurse",
+        "base_pathway_name": "4-Year Degree",
+        "core_keywords": {"public health": 10, "community": 10, "epidemiology": 8},
+        "secondary_keywords": {"health promotion": 8, "disease prevention": 5, "population": 5},
+        "nice_to_have_keywords": {},
+        "general_ed_keywords": {"community": 10, "advocacy": 8, "education": 8, "policy": 5, "sociology": 5},
+        "negative_keywords": ["intensive care", "icu", "trauma", "surgery", "acute care", "hospital"]
+      }
+    ]
+  }
+}

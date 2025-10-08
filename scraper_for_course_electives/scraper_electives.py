@@ -4,168 +4,113 @@ import requests
 import json
 import sys
 import os
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, List
 
 HEADERS = {
-    "User-Agent": "HawkAdvisor-Scraper/1.0 (Academic Project; RRRRRRRRRRR@gmail.com)"
+    "User-Agent": "HawkAdvisor-Scraper/1.0 (Academic Project; your-email@example.com)",
+    "Referer": "https://www.uml.edu/student-dashboard/",
 }
 
-API_URL = "https://www.uml.edu/api/registrar/course_catalog/v1.0/courses"
+API_URL = "https://www.uml.edu/student-dashboard/api/ClassSchedule/RealTime/Search/"
 
-def fetch_course_data(prefix: str) -> Any:
+def fetch_course_data(search_type: str, query: str, term: str = "3510") -> List[Dict[str, Any]]:
     """
-    Call UML registrar API:
-      https://www.uml.edu/api/registrar/course_catalog/v1.0/courses?field=subject&query=<PREFIX>
-    Returns parsed JSON (list or dict, depending on API).
+    Calls the single, powerful student dashboard API to search for courses.
     """
-    params = {"field": "subject", "query": prefix}
-    print(f"🔎 Requesting {prefix} courses from {API_URL} with params {params}")
-    resp = requests.get(API_URL, headers=HEADERS, params=params, timeout=20)
-    resp.raise_for_status()
-    return resp.json()
+    # Base parameters required for any search
+    params = {
+        "term": term,
+        "page": 1,
+        "pageSize": 5000,
+        # --- THIS IS THE CRITICAL FIX ---
+        "courseOfferingModes": "1" # '1' specifies "Undergraduate Classes"
+    }
 
-def to_lower_keys(d: Dict[str, Any]) -> Dict[str, Any]:
-    """Return a copy of dict with lower-cased keys for case-insensitive access."""
-    return { (k.lower() if isinstance(k, str) else k): v for k, v in d.items() }
+    # Add the specific search type parameter
+    if search_type == 'prefix':
+        params['subjects'] = query
+    elif search_type == 'core':
+        params['coreCurriculumBOKs'] = query
+    else:
+        return []
 
-def pick(d: Dict[str, Any], candidates: Iterable[str]) -> Any:
-    """
-    Return first non-empty value in d for any candidate key (case-insensitive).
-    Candidates should be provided in lower-case.
-    """
-    for k in candidates:
-        if k in d and d[k] not in (None, "", []):
-            return d[k]
-    return None
+    print(f"🔎 Requesting data from {API_URL} with params: {params}")
+    try:
+        resp = requests.get(API_URL, headers=HEADERS, params=params, timeout=30)
+        resp.raise_for_status()
+        
+        data = resp.json().get('data', {})
+        return data.get('Classes', [])
+        
+    except requests.RequestException as e:
+        print(f"    - Error: Could not fetch data. Error: {e}")
+        return []
 
 def normalize_record(rec: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Map an arbitrary course record from the API into our normalized structure.
-    Tries multiple aliases and falls back safely.
+    Maps a course record from the new API into our final normalized structure.
     """
-    lower = to_lower_keys(rec)
-
-    # Try subject
-    subject = pick(lower, ["subject", "subjectcode", "subj", "dept", "department", "prefix"])
-
-    # Try catalog/course number
-    catalog = pick(lower, [
-        "catalognbr", "catalog_nbr", "catalognumber", "catalog", "number",
-        "coursenumber", "course_number", "course_num", "cnum", "catnum"
-    ])
-
-    # Try combined code like "COMP.1000"
-    code = pick(lower, ["code", "coursecode", "id"])
-
-    # Compose course_number
-    course_number = None
-    if subject and catalog:
-        course_number = f"{str(subject).strip()}.{str(catalog).strip()}"
-    elif code:
-        # If code exists (e.g., "COMP.1000"), use it directly
-        course_number = str(code).strip()
-
-    # Title
-    title = pick(lower, ["title", "coursename", "name", "longtitle", "long_title"])
-
-    # Credits
-    credits = pick(lower, ["mincredits", "credits", "credithours", "units", "credit"])
-
-    # Description
-    description = pick(lower, ["description", "descr", "desc", "course_description"])
-
-    # Prerequisites
-    prerequisites = pick(lower, ["prerequisites", "prereq", "requisites", "requirements"])
-    if not prerequisites:
-        prerequisites = "This class has no prerequisites."
-
-    # Terms offered / semesters
-    offered_semesters = pick(lower, ["termsoffered", "terms", "offeredterms", "offered", "semesters", "term"])
+    details = rec.get('Details', {})
+    
+    course_number = f"{details.get('Subject', '')}.{details.get('CatalogNumber', '')}"
+    course_name = details.get('CourseTitle')
+    credits = details.get('MinimumCredits')
+    description = details.get('CourseDescription')
+    prereqs = details.get('EnrollmentRequirements')
+    
+    if not prereqs:
+        prereqs = "This class has no prerequisites."
 
     return {
         "course_number": course_number,
-        "course_name": title,
+        "course_name": course_name,
         "credits": credits,
         "description": description,
-        "prerequisites": prerequisites,
-        "offered_semesters": offered_semesters
+        "prerequisites": prereqs,
+        "offered_semesters": None
     }
 
-def coerce_to_list(api_json: Any) -> List[Dict[str, Any]]:
-    """
-    The API *usually* returns a list; if it returns a dict wrapper,
-    try common container keys like 'data', 'results', 'items'.
-    """
-    if isinstance(api_json, list):
-        return api_json
-
-    if isinstance(api_json, dict):
-        lower = to_lower_keys(api_json)
-        for key in ["data", "results", "items", "courses", "payload"]:
-            if key in lower and isinstance(lower[key], list):
-                return lower[key]
-        # Some APIs return dict of id->record
-        # Fall back: if values look like dicts, convert to list
-        if all(isinstance(v, dict) for v in lower.values()):
-            return list(lower.values())
-
-    # Last resort: wrap single object
-    return [api_json]
-
-def format_courses(api_data: Any) -> List[Dict[str, Any]]:
-    """
-    Normalize API results into desired JSON format, robust to schema drift.
-    """
-    raw_list = coerce_to_list(api_data)
-
-    normalized: List[Dict[str, Any]] = []
-    skipped_samples: List[Dict[str, Any]] = []
-
-    for rec in raw_list:
-        if not isinstance(rec, dict):
-            continue
-        norm = normalize_record(rec)
-        # Require at least course_number or course_name
-        if not norm["course_number"] and not norm["course_name"]:
-            if len(skipped_samples) < 5:
-                skipped_samples.append({"keys": list(rec.keys()), "sample": rec})
-            continue
-        normalized.append(norm)
-
-    if skipped_samples:
-        print(f"⚠️ Skipped {len(skipped_samples)} records without identifiable keys.")
-        # Print just the keys to help you adjust quickly
-        for i, s in enumerate(skipped_samples, 1):
-            print(f"   • Sample {i} keys: {s['keys']}")
-
-    return normalized
-
 def main():
-    if len(sys.argv) != 3:
-        print("Usage: python scraper_electives.py <PREFIX> <output_file.json>")
+    if len(sys.argv) != 4:
+        print("Usage: python scraper_electives.py <TYPE> <QUERY> <output_file.json>")
+        print("\nExamples:")
+        print("  python scraper_electives.py prefix COMP data/ComputerScience/comp_electives.json")
+        print("  python scraper_electives.py core AH data/CoreCurriculum/arts_humanities.json")
         sys.exit(1)
 
-    prefix = sys.argv[1].upper()
-    output_file = sys.argv[2]
+    search_type = sys.argv[1].lower()
+    query = sys.argv[2].upper()
+    output_file = sys.argv[3]
 
+    raw_course_data = []
+    
     try:
-        api_json = fetch_course_data(prefix)
-        final = format_courses(api_json)
-    except requests.HTTPError as e:
-        print(f"❌ HTTP error: {e}")
-        sys.exit(1)
-    except requests.RequestException as e:
-        print(f"❌ Request error: {e}")
-        sys.exit(1)
-    except json.JSONDecodeError:
-        print("❌ API did not return valid JSON.")
+        if search_type in ['prefix', 'core']:
+            raw_course_data = fetch_course_data(search_type, query)
+        else:
+            print(f"❌ Error: Unknown search_type '{search_type}'. Use 'prefix' or 'core'.")
+            sys.exit(1)
+
+        unique_courses = {}
+        for course_record in raw_course_data:
+            normalized = normalize_record(course_record)
+            if normalized['course_number'] and normalized['course_number'] not in unique_courses:
+                unique_courses[normalized['course_number']] = normalized
+        
+        final_data = list(unique_courses.values())
+
+    except Exception as e:
+        print(f"❌ An unexpected error occurred: {e}")
         sys.exit(1)
 
-    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+    output_dir = os.path.dirname(output_file)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+        
     with open(output_file, "w", encoding="utf-8") as f:
-        json.dump(final, f, indent=2, ensure_ascii=False)
+        json.dump(final_data, f, indent=2, ensure_ascii=False)
 
-    print(f"✅ Done. Saved {len(final)} {prefix} courses to {output_file}")
+    print(f"\n✅ Done. Saved {len(final_data)} unique courses for '{query}' to {output_file}")
 
 if __name__ == "__main__":
     main()
